@@ -1,10 +1,12 @@
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
 buildscript {
 	repositories {
 		mavenLocal()
 		maven { url "https://repo1.maven.org/maven2" }
 	}
 	dependencies {
-		classpath "org.openapitools:openapi-generator-gradle-plugin:5.3.0"
+		classpath "org.openapitools:openapi-generator-gradle-plugin:6.0.0-beta"
 	}
 }
 
@@ -12,7 +14,13 @@ plugins {
 	id 'org.springframework.boot' version '2.6.6'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
-	id 'org.openapi.generator' version '5.3.0'
+	id 'org.openapi.generator' version '5.4.0'
+}
+
+configurations {
+	all {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+	}
 }
 
 group = 'com.example'
@@ -25,6 +33,15 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+//	implementation 'com.squareup.okhttp3:okhttp:4.9.3'
+//	implementation 'com.squareup.okhttp3:logging-interceptor:4.9.3'
+//	implementation 'com.google.code.gson:gson:2.8.0'
+//	implementation 'io.gsonfire:gson-fire:1.8.3'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -34,9 +51,9 @@ tasks.named('test') {
 }
 targetCompatibility = JavaVersion.VERSION_11
 
-task generateKrakenApiClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+task generateKrakenApiClient(type: GenerateTask) {
 	generatorName = "java"
-	inputSpec = "$rootDir/api-gen/kraken-api.json".toString()
+	inputSpec = "$rootDir/api-gen/kraken-rest-api-validated.json".toString()
 	outputDir = "$buildDir/api-client-generated".toString()
 	apiPackage = "com.example.ticker.api"
 	invokerPackage = "com.example.ticker.invoker"
@@ -50,4 +67,24 @@ task generateKrakenApiClient(type: org.openapitools.generator.gradle.plugin.task
 	logToStderr = true
 	generateAliasAsModel = false
 	enablePostProcessFile = false
+	library = "resttemplate"
 }
+
+//sourceSets {
+//	main {
+//		java {
+//			srcDir(files("${generateKrakenApiClient.outputDir.get()}/src/main"))
+//		}
+//	}
+//}
+
+//tasks {
+//	compileJava {
+//		dependsOn(generateKrakenApiClient)
+//	}
+//}
+
+//java {
+//	sourceCompatibility = JavaVersion.VERSION_1_8
+//	targetCompatibility = JavaVersion.VERSION_1_8
+//}

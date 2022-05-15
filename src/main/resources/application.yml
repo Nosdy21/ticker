@@ -1,0 +1,11 @@
+ticker:
+  pairs:
+    - LTC/ETH
+    - BTC/ETH
+    - SOL/EUR
+    - XRP/ETH
+    - ADA/ETH
+
+logging:
+  level:
+    root: INFO
